@@ -30,7 +30,7 @@ npx @puppeteer/browsers install chrome@stable
 
 ## 安装独立 Skill
 
-Release 中的 `weekly-production-1.0.0.zip` 包含可独立运行的 Skill 文件夹。把文件夹放入你的助手所支持的 Skill 目录，保留内部结构，然后安装依赖：
+Release 中的 `weekly-production-1.1.0.zip` 包含可独立运行的 Skill 文件夹，也包含网页与分享图导出功能。把文件夹放入你的助手所支持的 Skill 目录，保留内部结构，然后安装依赖：
 
 ```sh
 python -m pip install -r "你的Skill目录/weekly-production/scripts/requirements.txt"

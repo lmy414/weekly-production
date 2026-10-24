@@ -12,11 +12,13 @@ SKILL = ROOT / "skills/weekly-production"
 
 
 def public_files():
-    required = {"SKILL.md", "LICENSE", "agents/openai.yaml", "references/input.md", "references/cli.md",
+    required = {"SKILL.md", "LICENSE", "agents/openai.yaml", "references/input.md", "references/cli.md", "references/web.md",
                 "scripts/weekly.py", "scripts/capture.mjs", "scripts/requirements.txt", "scripts/requirements-analysis.txt",
                 "scripts/package.json", "scripts/package-lock.json"}
     allowed = set(required)
     allowed.update(str(p.relative_to(SKILL)).replace("\\", "/") for p in (SKILL / "scripts/weekly_runtime").glob("*.py"))
+    allowed.update("scripts/weekly_web/" + name for name in ("__init__.py", "settings.py", "cards.py", "views.py", "builder.py", "exporter.py"))
+    allowed.update("assets/web/" + name for name in ("site.css", "app.js", "favicon.svg"))
     ui_names = {"index.html", "studio.js", "studio.css", "program.js", "program.css", "editorial.js", "editorial.css", "motion.js", "motion.css"}
     allowed.update("assets/ui/" + name for name in ui_names)
     for path in (SKILL / "assets/ui/fonts").rglob("*"):

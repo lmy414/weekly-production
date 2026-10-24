@@ -22,7 +22,9 @@
 
 `copy` 可选，当前支持 `opening_kicker`、`opening_subtitle`、`opening_tagline`、`opening_note`、`statistics_text`、`outro_text`、`end_text`。值为文字，固定规则、公式与真实口径不能通过这些字段替换。未知字段报错，长文案在捕获时检查排版。
 
-`branding` 可选，字段为 `producer`、`website_name`、`website_url`、`update_schedule`。`producer` 进入制作署名，`update_schedule` 进入片尾。网站信息保留在本期计划供后续用途，不增加当前成品以外的交付。
+`branding` 可选，字段为 `producer`、`website_name`、`website_url`、`update_schedule`。`producer` 进入制作署名，`update_schedule` 进入片尾。网站署名不自动启用二维码；配套网页与分享图通过 [web.md](web.md) 的导出命令和配置生成。
+
+每条作品可在 `provenance.website` 保存公开 `summary` 和 `category`。已有锁定成片时，用独立 `--editorial` 文件补充网站文案，保留原输入不变。
 
 ## 角色素材 character.json
 

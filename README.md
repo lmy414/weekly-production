@@ -2,9 +2,11 @@
 
 把本期榜单、文案、原视频和 BGM 放在一起，再选一套角色素材，导出一支完整的周刊视频。你可以直接运行 CLI，也可以让支持 Skill 的 AI 助手替你整理材料、选择片段和执行制作。
 
+同一期内容还可以导出像素风文字网页、整期榜单长图和每条作品的 PNG 分享卡。网页与视频使用同一片单、名次、得分和节目时间，不用再整理一份榜单。
+
 ![开场画面：像素风直播间与演示角色](docs/images/opening.jpg)
 
-[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-1.0.0.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip)
+[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.1.0/weekly-production-1.1.0.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip)
 
 ## 你会得到什么
 
@@ -102,11 +104,25 @@ python weekly.py build --episode "我的周刊材料/第002期/episode.json" --c
 
 ## 让 AI 助手运行
 
-[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-1.0.0.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
+[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.1.0/weekly-production-1.1.0.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
 
 > 使用 weekly-production。读取我提供的 episode.json 和 character.json，检查材料与选段，使用现有文案、配乐和素材，导出指定路径的完整 MP4。需要补选段时，先查看本地视频，保留能独立理解的连续段落。
 
 Skill 可以辅助整理与选段。已有完整输入时，CLI 本身不依赖在线模型，材料读取与渲染在本机完成。
+
+## 网页与分享图
+
+在 `build` 命令中加 `--web-output "output/website"`，成片通过检查后会一起生成图文版。已有 MP4 时，可直接导出，无需重渲染：
+
+```sh
+python weekly.py export --episode "本期/episode.json" --character "角色/character.json" --output "成品/第002期.mp4" --directory "output/website" --json
+```
+
+你会得到可部署的静态网站：本期榜单、往期档案、计分说明、作品搜索筛选，以及可预览和保存的整期长图与作品卡。重复导出会保留往期页面，同一期更新原页面。分享图保留标题、作者、名次和得分。
+
+**二维码默认关闭。** 要使用，请自己提供网站地址，再加 `--qr --site-url https://weekly.example.com`。默认扫码访问你的网站本期页，作品卡定位到对应作品；需要原作地址或自定义跳转时再配置链接源。网站署名不会自动开启二维码，也不会自动加入追踪参数。
+
+完整配置、公开介绍和本地预览方法见[图文导出说明](skills/weekly-production/references/web.md)。`v1.1.0` Skill 已包含图文模板和导出命令；此前的 `v1.0.0` Release 保留原视频版本。
 
 ## 计分与使用范围
 

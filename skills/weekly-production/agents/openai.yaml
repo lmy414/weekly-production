@@ -1,4 +1,4 @@
 interface:
-  display_name: "周刊视频制作"
-  short_description: "读取每期数据与角色素材，校验榜单、编排画面和声音，生成完整周刊视频"
-  default_prompt: "使用 $weekly-production，根据每期数据包和角色素材包制作成品 MP4。"
+  display_name: "周刊视频与图文制作"
+  short_description: "读取每期数据与角色素材，制作完整周刊视频，并按需导出静态网页和 PNG 分享图"
+  default_prompt: "使用 $weekly-production，根据每期数据包和角色素材包制作 MP4，并生成配套网页和分享图。"
