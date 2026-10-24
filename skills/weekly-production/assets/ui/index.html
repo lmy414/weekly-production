@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI 娘周刊 · 像素演播室</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23273549' d='M4 8h24v16H4zM12 4h8v24h-8z'/%3E%3Cpath fill='%23bce7db' d='M8 12h16v8H8z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="program.css">
+  <link rel="stylesheet" href="editorial.css">
+  <link rel="stylesheet" href="motion.css">
+</head>
+<body>
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 16 16"><path d="M2 3h12v10H2zM5 1v2m6-2v2M1 6h14M6 7l5 3-5 2z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 16 16"><path d="M2 3h4v2h4V3h4v6h-2v2h-2v2H6v-2H4V9H2z"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 16 16"><path d="M5 1h6v2h2v2h2v6h-2v2h-2v2H5v-2H3v-2H1V5h2V3h2zM6 5h4v6H6z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 16 16"><path d="M7 1h2v4h4v2h2v2h-4v4H9v2H7v-4H3V9H1V7h4V3h2z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 16 16"><path d="M6 1h4v8H6zM3 6v5h2v2h6v-2h2V6M8 13v2M5 15h6"/></symbol>
+    <symbol id="i-whale" viewBox="0 0 24 16"><path d="M2 5h12v2h2v2h4V5h2V1h-4v4h-2V3H6V1H4v2H2zm0 0v6h2v2h12v-2h2V9M6 7h2M2 9h10"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M1 7h10V3h2v2h2v6h-2v2h-2V9H1z"/></symbol>
+  </svg>
+
+  <div class="preview-shell">
+    <header class="preview-toolbar">
+      <a class="preview-brand" href="./"><span class="small-pixel">✦</span> AI 娘周刊 <span>本期节目 / 001</span></a>
+      <nav aria-label="节目画面">
+        <button data-mode="ranking" aria-pressed="true">普通榜单</button>
+        <button data-mode="podium" aria-pressed="false">前三名</button>
+        <button data-mode="transition" aria-pressed="false">角色转场</button>
+        <button data-mode="cover" aria-pressed="false">本期封面</button>
+      </nav>
+      <button id="sequence" class="sequence-button" aria-pressed="false">播放编排</button>
+    </header>
+
+    <main>
+      <div class="stage-wrap" id="stage-wrap">
+        <article class="stage" id="stage" data-mode="ranking" data-host="deepseek" aria-label="1920 × 1080 节目画面">
+          <div class="pixel-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+          <header class="show-header">
+            <div class="show-brand"><div class="brand-stamp">AI</div><div><h1>AI娘周刊</h1><p>AI GIRL WEEKLY</p></div><span class="brand-spark">✦</span></div>
+            <div class="episode-strip"><b>创刊特辑</b><span>近 28 天 AI 娘新作</span><span class="strip-dot"></span><span>ISSUE 001</span></div>
+            <div class="show-status"><span class="status-light"></span><span id="status-label">作品放映中</span><span class="status-bars"><i></i><i></i><i></i><i></i></span></div>
+          </header>
+
+          <section class="ranking-layout" aria-label="榜单作品">
+            <div class="work-window pixel-window">
+              <div class="window-bar"><span class="window-file"><svg><use href="#i-play"/></svg><span>本期作品放映室</span></span><span class="window-controls" aria-hidden="true">− □ ×</span></div>
+              <div class="work-viewport"><video id="work-video" playsinline muted loop preload="metadata" aria-label="入选作品片段"></video><span class="source-label">原片画面 / 保留原声</span></div>
+              <div class="playback-line"><i id="playback-fill"></i></div>
+            </div>
+
+            <aside class="rank-sidebar">
+              <section class="rank-panel pixel-window">
+                <div class="rank-caption"><span>本期名次</span><b id="rank-state">NEW</b></div>
+                <div class="rank-number"><span>NO.</span><strong id="rank-number">15</strong><svg><use href="#i-star"/></svg></div>
+                <div class="score-label">综合得分 <span>创刊期累计口径</span></div>
+                <div class="score-number" id="view-value">—</div>
+                <div class="stat-row"><div><svg><use href="#i-play"/></svg><span>播放</span><b id="play-value">—</b></div><div><svg><use href="#i-play"/></svg><span>评论</span><b id="reply-value">—</b></div><div><svg><use href="#i-play"/></svg><span>弹幕</span><b id="danmaku-value">—</b></div><div><svg><use href="#i-coin"/></svg><span>投币</span><b id="coin-value">—</b></div><div><svg><use href="#i-star"/></svg><span>收藏</span><b id="favorite-value">—</b></div><div><svg><use href="#i-heart"/></svg><span>点赞</span><b id="like-value">—</b></div></div>
+              </section>
+              <section class="host-panel pixel-window">
+                <div class="host-label"><svg><use href="#i-whale"/></svg><span>AI GIRL WEEKLY</span></div>
+                <div class="host-dots" aria-hidden="true"></div>
+                <img class="host-art host-watching" src="/preview-assets/host.png" alt="重新设计的鲸鱼娘陪看主持姿势">
+                <div class="host-nameplate"><svg><use href="#i-whale"/></svg><span>AI娘周刊</span><span class="on-air">ON AIR</span></div>
+              </section>
+            </aside>
+
+            <footer class="work-caption"><div class="caption-main"><span class="caption-marker">▶</span><h2 id="work-title">作品载入中</h2><p><span id="work-author">原作者</span><span class="caption-divider">/</span><span id="work-bvid">BVID</span></p></div><div class="caption-tag"><svg><use href="#i-whale"/></svg><span>AI 娘同人创作</span></div></footer>
+          </section>
+
+          <section class="transition-layout" aria-label="栏目转场" hidden>
+            <div class="transition-number" aria-hidden="true">NEXT</div>
+            <div class="transition-card pixel-window">
+              <div class="window-bar"><span>切换到下一个频道…</span><span>01 → 02</span></div>
+              <div class="transition-copy"><div class="kicker"><span class="status-light"></span>WEEKLY NEWS</div><p>好作品看完了，</p><h2>这周 AI 圈<br>又发生了什么？</h2><div class="transition-bottom"><span>接下来 / 一周模型新闻</span><svg><use href="#i-arrow"/></svg></div></div>
+            </div>
+            <div class="transition-character"><div class="character-orbit"></div><img src="/preview-assets/transition.png" alt="鲸鱼娘转场引导新姿势"><span class="character-sticker">NEWS TIME!</span></div>
+            <div class="transition-pixels" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="transition-footer"><span>AI GIRL WEEKLY</span><span>本周作品 → 模型新闻 → 下期再见</span><span>✦</span></div>
+          </section>
+
+          <section class="news-layout" aria-label="一周模型新闻" hidden>
+            <div class="news-topline"><div><span class="news-pill">WEEKLY NEWS</span><h2>模型圈周报<span>本周 AI 动态</span></h2></div><div class="news-period">这一周<span id="news-period"></span></div></div>
+            <div class="news-board pixel-window">
+              <div class="window-bar"><span>本周速读 / 01</span><span>一周 AI 进展</span></div>
+              <div class="news-story">
+                <div class="news-meta"><span>模型更新</span><span>01 / 03</span></div>
+                <h3>这一周的模型圈</h3>
+                <p class="news-deck"></p>
+                <ol class="news-questions"><li><b>01</b><div><strong>这次更新</strong><p></p></div></li><li><b>02</b><div><strong>值得关注</strong><p></p></div></li><li><b>03</b><div><strong>现在进展</strong><p></p></div></li></ol>
+                <div class="news-source"><span>来源</span><p></p><b>原文链接在简介</b></div>
+              </div>
+            </div>
+            <aside class="news-host"><img src="/preview-assets/news.png" alt="本期角色插画"><div class="news-host-desk"><svg><use href="#i-whale"/></svg><span>WEEKEND<br>BRIEFING</span><b>AI娘周刊</b></div></aside>
+            <div class="news-queue"><div class="active"><b>01</b><span>模型与能力更新</span></div><div><b>02</b><span>开源与工具发布</span></div><div><b>03</b><span>行业重要事件</span></div><span class="queue-time">每期 3～5 条 / 60～90 秒</span></div>
+          </section>
+
+          <section class="cover-layout" aria-label="本期封面" hidden>
+            <div class="cover-grid" aria-hidden="true"></div><div class="cover-edition"><span>ISSUE</span><b>001</b><span>创刊号</span></div>
+            <div class="cover-copy"><span class="cover-kicker">AI 娘创作放映室</span><h2>AI娘<br><span>周刊</span><svg><use href="#i-star"/></svg></h2><div class="cover-subtitle">近 28 天 AI 娘新作</div><div class="cover-bottom"><b>创刊特辑</b><span>模型下班，角色上场。</span></div></div>
+            <div class="cover-portrait"><div class="cover-orbit"></div><span class="cover-spark spark-one">✦</span><span class="cover-spark spark-two">✦</span><img src="/preview-assets/transition.png" alt="鲸鱼娘主题封面新姿势"></div>
+            <div class="cover-note"><svg><use href="#i-whale"/></svg><span>本期 AI 娘创作放映室</span><span>原视频 · 计分规则见简介</span></div>
+          </section>
+
+          <div class="stage-footnote"><span id="stage-note">创刊特辑 · 近 28 天 AI 娘新作</span><span>AI GIRL WEEKLY / 本期片单</span></div>
+        </article>
+      </div>
+
+      <section class="preview-notes" aria-label="当前画面说明"><div><span id="mode-index">01 / 05</span><h2 id="mode-heading">作品是主角，主持陪你看。</h2><p id="mode-description">固定 16:9 作品窗，数据集中在右侧，底部保留原作者与标题。原片不做像素化。</p></div><div class="preview-actions"><button id="mute" aria-pressed="true">开启原片声音</button><button id="immersive" hidden>切到作品全屏</button><a href="?clean=1&mode=ranking" target="_blank" rel="noopener">纯画面预览 ↗</a><span id="load-state" role="status">正在载入本期节目…</span></div></section>
+    </main>
+    <footer class="preview-footer"><span><i class="swatch mint"></i> 薄荷窗口 <i class="swatch cream"></i> 奶油底色 <i class="swatch coral"></i> 珊瑚强调 <i class="swatch ink"></i> 墨色描边</span><span>角色与服装按期更换 / 节目 UI 保持统一</span></footer>
+  </div>
+  <script src="studio.js" defer></script>
+  <script src="editorial.js" defer></script>
+  <script src="motion.js" defer></script>
+  <script src="program.js" defer></script>
+</body>
+</html>

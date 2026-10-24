@@ -1,0 +1,4 @@
+Pillow>=11,<13
+numpy>=1.26,<3
+av>=14,<20
+imageio-ffmpeg>=0.5,<1

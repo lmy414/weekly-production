@@ -1,0 +1,8 @@
+{
+  "name": "weekly-production-renderer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "dependencies": {"puppeteer-core": "25.10.0"}
+}
