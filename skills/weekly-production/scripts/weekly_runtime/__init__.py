@@ -1,3 +1,3 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """Offline, file-driven weekly video production."""
-VERSION = "1.2.0"
+VERSION = "1.2.1"

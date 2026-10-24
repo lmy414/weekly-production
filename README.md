@@ -2,11 +2,11 @@
 
 把本期榜单、文案、原视频和 BGM 放在一起，再选一套角色素材，导出一支完整的周刊视频。你可以直接运行 CLI，也可以让支持 Skill 的 AI 助手替你整理材料、选择片段和执行制作。
 
-同一期内容还可以导出像素风文字网页、整期榜单长图、每条作品的 PNG 分享卡，以及 2.35:1 和 1:1 公众号封面。网页与视频使用同一片单、名次、得分和节目时间，不用再整理一份榜单。
+同一期内容还可以导出像素风文字网页、整期榜单长图、每条作品的 PNG 分享卡，以及一张兼容 2.35:1 和 1:1 裁切的公众号封面。网页与视频使用同一片单、名次、得分和节目时间，不用再整理一份榜单。
 
 ![开场画面：像素风直播间与演示角色](docs/images/opening.jpg)
 
-[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-skill-v1.2.0.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip) · [下载网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-web-demo-v1.2.0.zip)
+[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.2.1/weekly-production-skill-v1.2.1.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip) · [下载网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.1/weekly-production-web-demo-v1.2.1.zip)
 
 ## 你会得到什么
 
@@ -56,7 +56,7 @@
 
 ![生成的网站：左侧为桌面首页、前三名与主榜，右侧为手机布局](docs/images/website-responsive.jpg)
 
-[查看桌面大图](docs/images/website-desktop-full.jpg) · [查看手机大图](docs/images/website-mobile.png) · [下载完整网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-web-demo-v1.2.0.zip)
+[查看桌面大图](docs/images/website-desktop-full.jpg) · [查看手机大图](docs/images/website-mobile.png) · [下载完整网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.1/weekly-production-web-demo-v1.2.1.zip)
 
 网站包含本期刊头、前三名、完整主榜、公开介绍和计分口径。可以搜索作品、作者和 BV 号，按类型筛选，展开查看完整指标与节目时间。每期拥有固定页面，另有往期归档与计分说明。
 
@@ -69,13 +69,13 @@
 | ![五部虚构作品的整期榜单长图](docs/images/issue-share.png) | ![包含封面、作者、名次、得分和指标的独立作品卡](docs/images/work-card.png) |
 | 一张图保留整期片单，适合保存或分享。 | 每条作品单独导出，保留原作信息与公开介绍。 |
 
-### 公众号双尺寸封面
+### 公众号单张封面，两种裁切
 
-| 2.35:1 横版 · 1410 × 600 | 1:1 方版 · 1080 × 1080 |
+| 2.35:1 整图预览 | 1:1 居中裁切预览 |
 | --- | --- |
-| ![公众号横版封面，刊名与人物上半身分别排版](docs/images/cover-wechat-2.35x1.jpg) | ![公众号方版封面，保留角色素材全幅](docs/images/cover-wechat-1x1.jpg) |
+| ![同一张公众号母版的横版预览](docs/images/cover-wechat-preview-2.35x1.png) | ![从同一张母版正中央直接裁出的方形预览](docs/images/cover-wechat-preview-1x1.png) |
 
-两张 JPEG 使用独立构图，图文导出时自动生成。上传公众号时分别选择对应封面，核对后台的裁剪预览。
+只上传一张 [2538 × 1080 JPEG 母版](docs/images/cover-wechat-master.jpg)。刊名、期号、人物面部与主要文案集中在中间 1080 × 1080 的区域；两侧为可裁掉的补充信息。上面两张 PNG 从同一张母版生成，分别展示整图和居中裁切效果。公众号后台选择横版整图、方形居中，再核对预览。
 
 ### 公众号正文排版
 
@@ -141,7 +141,7 @@ python weekly.py build --episode "我的周刊材料/第002期/episode.json" --c
 
 ## 让 AI 助手运行
 
-[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-skill-v1.2.0.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
+[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.2.1/weekly-production-skill-v1.2.1.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
 
 > 使用 weekly-production。读取我提供的 episode.json 和 character.json，检查材料与选段，使用现有文案、配乐和素材，导出指定路径的完整 MP4。需要补选段时，先查看本地视频，保留能独立理解的连续段落。
 
@@ -157,11 +157,11 @@ python weekly.py export --episode "本期/episode.json" --character "角色/char
 
 你会得到可部署的静态网站：本期榜单、往期档案、计分说明、作品搜索筛选，以及可预览和保存的整期长图与作品卡。重复导出会保留往期页面，同一期更新原页面。分享图保留标题、作者、名次和得分。
 
-导出还会生成两张分别排版的公众号 JPEG 封面：横版 1410 × 600（2.35:1）和方版 1080 × 1080（1:1）。文件位于 `assets/issues/<期号>/cover-wechat-2.35x1.jpg` 与 `cover-wechat-1x1.jpg`，CLI 结果中的 `wechat_covers` 返回完整路径。
+导出还会生成 `assets/issues/<期号>/cover-wechat-master.jpg`，一张 2538 × 1080（2.35:1）的公众号上传母版。`cover-wechat-preview-2.35x1.png` 为整图缩放预览，`cover-wechat-preview-1x1.png` 为中间 1080 × 1080 区域的直接裁切预览。CLI 结果的 `wechat_covers.master/landscape/square` 返回对应完整路径；上传时只选择 `master`。
 
 **二维码默认关闭。** 要使用，请自己提供网站地址，再加 `--qr --site-url https://weekly.example.com`。默认扫码访问你的网站本期页，作品卡定位到对应作品；需要原作地址或自定义跳转时再配置链接源。网站署名不会自动开启二维码，也不会自动加入追踪参数。
 
-完整配置、公开介绍和本地预览方法见[图文导出说明](skills/weekly-production/references/web.md)。`v1.2.0` Skill 在图文导出的基础上增加公众号双尺寸封面；此前的 `v1.0.0` Release 保留原视频版本。
+完整配置、公开介绍和本地预览方法见[图文导出说明](skills/weekly-production/references/web.md)。`v1.2.1` Skill 将公众号封面修正为一张母版兼容两种裁切；此前的 `v1.0.0` Release 保留原视频版本。
 
 ## 计分与使用范围
 

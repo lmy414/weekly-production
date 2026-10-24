@@ -99,11 +99,19 @@ class WebExportTests(unittest.TestCase):
                 again = export_site(episode, character, video, out)
                 self.assertEqual(result["build"]["revision"], again["build"]["revision"])
                 self.assertFalse(result["qr"]["enabled"])
-                for name, size in {"landscape": (1410, 600), "square": (1080, 1080)}.items():
+                for name, (size, image_format) in {"master": ((2538, 1080), "JPEG"),
+                                                    "landscape": ((1410, 600), "PNG"),
+                                                    "square": ((1080, 1080), "PNG")}.items():
                     with Image.open(result["wechat_covers"][name]) as cover:
                         self.assertEqual(cover.size, size)
-                        self.assertEqual(cover.format, "JPEG")
+                        self.assertEqual(cover.format, image_format)
                         self.assertEqual(cover.mode, "RGB")
+                # Both previews must come from the exact upload image, without rearranging any content.
+                with Image.open(result["wechat_covers"]["master"]) as master, \
+                        Image.open(result["wechat_covers"]["square"]) as square, \
+                        Image.open(result["wechat_covers"]["landscape"]) as landscape:
+                    self.assertEqual(master.crop((729, 0, 1809, 1080)).tobytes(), square.tobytes())
+                    self.assertEqual(master.resize((1410, 600), Image.Resampling.LANCZOS).tobytes(), landscape.tobytes())
                 second = root / "second"
                 second.mkdir()
                 ep2, ch2, vid2, _ = recorded_movie(second, "synthetic-002")
@@ -111,7 +119,7 @@ class WebExportTests(unittest.TestCase):
             self.assertEqual(set(updated["build"]["issues"]), {"synthetic-001", "synthetic-002"})
             self.assertEqual(updated["build"]["html_pages"], 6)
             self.assertTrue((out / "issues/synthetic-001/index.html").is_file())
-            for name in ("cover-wechat-2.35x1.jpg", "cover-wechat-1x1.jpg"):
+            for name in ("cover-wechat-master.jpg", "cover-wechat-preview-2.35x1.png", "cover-wechat-preview-1x1.png"):
                 self.assertTrue((out / "assets/issues/synthetic-001" / name).is_file())
             text = "".join(p.read_text("utf-8") for p in out.rglob("*") if p.suffix in (".html", ".json"))
             for value in ("PRIVATE-EDITORIAL-MARKER", "unused-signature.example", "episode.lock", "private_notes", str(episode)):
@@ -130,9 +138,11 @@ class WebExportTests(unittest.TestCase):
                 issue = manifest["issues"][0]
                 covers = issue.pop("wechat_covers")
                 assert_issue(issue)
+                issue["wechat_covers"] = {key: value for key, value in covers.items() if key != "master"}
+                assert_issue(issue)
                 atomic_json(out / "export-manifest.json", manifest)
                 result = export_site(episode, character, video, out)
-                self.assertEqual(set(result["wechat_covers"]), {"landscape", "square"})
+                self.assertEqual(set(result["wechat_covers"]), {"master", "landscape", "square"})
                 issue["wechat_covers"] = {**covers, "private": "C:/private.png"}
                 with self.assertRaisesRegex(InputError, "公众号封面"):
                     assert_issue(issue)

@@ -1,4 +1,4 @@
 interface:
   display_name: "周刊视频与图文制作"
-  short_description: "读取每期数据与角色素材，制作周刊视频、静态网页、分享图和公众号双尺寸封面"
-  default_prompt: "使用 $weekly-production，根据每期数据包和角色素材包制作 MP4，并生成配套网页、分享图及 2.35:1 与 1:1 公众号封面。"
+  short_description: "读取每期数据与角色素材，制作周刊视频、网页、分享图和兼容两种裁切的单张公众号封面"
+  default_prompt: "使用 $weekly-production，根据每期数据包和角色素材包制作 MP4，并生成配套网页、分享图，以及一张兼容 2.35:1 与 1:1 裁切的公众号母版及裁切预览。"

@@ -14,14 +14,17 @@ python <Skill>/scripts/weekly.py export --episode <本期>/episode.json --charac
 
 ## 公众号封面
 
-每次图文导出自动生成两张 JPEG，位于 `assets/issues/<期号>/`：
+每次图文导出自动生成一张上传母版和两张裁切预览，位于 `assets/issues/<期号>/`：
 
 | 结果字段 | 文件名 | 尺寸 | 比例 |
 | --- | --- | --- | --- |
-| `wechat_covers.landscape` | `cover-wechat-2.35x1.jpg` | 1410 × 600 | 2.35:1 |
-| `wechat_covers.square` | `cover-wechat-1x1.jpg` | 1080 × 1080 | 1:1 |
+| `wechat_covers.master` | `cover-wechat-master.jpg` | 2538 × 1080 | 2.35:1，唯一上传文件 |
+| `wechat_covers.landscape` | `cover-wechat-preview-2.35x1.png` | 1410 × 600 | 2.35:1，整图缩放预览 |
+| `wechat_covers.square` | `cover-wechat-preview-1x1.png` | 1080 × 1080 | 1:1，居中裁切预览 |
 
-两种画幅分别排版刊名、期号、本期作品数和角色素材。横版突出人物上半身，方版保留角色素材全幅，不拉伸或裁切现成的视频封面。封面不叠加二维码或网站地址，不受分享卡的二维码开关影响。发布公众号时将两张图一并交付，按后台对应封面位置上传，并检查裁剪预览。
+刊名、期号、人物面部与主要文案集中在母版正中央的 1080 × 1080 区域，即 `(729, 0, 1809, 1080)`；横版两侧放可被裁掉的补充文案和装饰。两张预览从保存后的同一张 JPEG 读取像素后生成，不能各自重新排版。封面不叠加二维码或网站地址，不受分享卡的二维码开关影响。
+
+发布公众号时只上传 `cover-wechat-master.jpg`：横版选择整张图，方形裁切框保持居中，再对照两张 PNG 检查刊名、期号和人物面部是否完整。PNG 文件仅供预览，不需要作为另一张封面上传。
 
 ## 制作时一起导出
 

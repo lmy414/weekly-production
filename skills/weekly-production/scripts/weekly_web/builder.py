@@ -33,8 +33,9 @@ def asset_refs(issue):
 def assert_issue(issue):
     if set(issue) - {"wechat_covers"} != ISSUE_FIELDS or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,79}", issue["id"]):
         raise InputError("web.issue", "无效期号或包含内部字段")
-    if "wechat_covers" in issue and (not isinstance(issue["wechat_covers"], dict) or set(issue["wechat_covers"]) != {"landscape", "square"}):
-        raise InputError("web.wechat_covers", "公众号封面须同时包含 landscape 与 square")
+    if "wechat_covers" in issue and (not isinstance(issue["wechat_covers"], dict)
+            or set(issue["wechat_covers"]) not in ({"landscape", "square"}, {"master", "landscape", "square"})):
+        raise InputError("web.wechat_covers", "公众号封面须包含 master、landscape 与 square；兼容旧版 landscape 与 square")
     works = issue["works"]
     if not works or [w["rank"] for w in works] != list(range(1, len(works) + 1)):
         raise InputError("web.works", "名次须连续")
