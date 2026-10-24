@@ -6,7 +6,7 @@
 
 ![开场画面：像素风直播间与演示角色](docs/images/opening.jpg)
 
-[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.1.0/weekly-production-1.1.0.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip)
+[观看完整演示 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) · [下载制作 Skill](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-skill-v1.2.0.zip) · [下载演示材料](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo-inputs-1.0.0.zip) · [下载网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-web-demo-v1.2.0.zip)
 
 ## 你会得到什么
 
@@ -47,6 +47,43 @@
 ![演示视频中的像素转场](docs/images/transition.gif)
 
 完整演示保留了所有栏目和原始导出规格。[下载 MP4](https://github.com/lmy414/weekly-production/releases/download/v1.0.0/weekly-production-demo.mp4) 可查看声音、连续选段和完整节奏。
+
+## 图文排版与生成网站
+
+下面的网站、榜单长图、作品卡和封面，均由上面的五部虚构短片演示包实际导出。网站截图取自浏览器，手机版使用 390px 视口。生成的页面与视频共用片单、名次、得分和节目时间。
+
+### 桌面与手机网站
+
+![生成的网站：左侧为桌面首页、前三名与主榜，右侧为手机布局](docs/images/website-responsive.jpg)
+
+[查看桌面大图](docs/images/website-desktop-full.jpg) · [查看手机大图](docs/images/website-mobile.png) · [下载完整网站演示包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-web-demo-v1.2.0.zip)
+
+网站包含本期刊头、前三名、完整主榜、公开介绍和计分口径。可以搜索作品、作者和 BV 号，按类型筛选，展开查看完整指标与节目时间。每期拥有固定页面，另有往期归档与计分说明。
+
+网站演示包是完整静态文件。解压后在目录里执行 `python -m http.server 8108 --bind 127.0.0.1`，打开 `http://127.0.0.1:8108/` 即可查看与截图相同的页面。
+
+### 榜单长图与作品卡
+
+| 整期榜单长图 | 单条作品分享卡 |
+| --- | --- |
+| ![五部虚构作品的整期榜单长图](docs/images/issue-share.png) | ![包含封面、作者、名次、得分和指标的独立作品卡](docs/images/work-card.png) |
+| 一张图保留整期片单，适合保存或分享。 | 每条作品单独导出，保留原作信息与公开介绍。 |
+
+### 公众号双尺寸封面
+
+| 2.35:1 横版 · 1410 × 600 | 1:1 方版 · 1080 × 1080 |
+| --- | --- |
+| ![公众号横版封面，刊名与人物上半身分别排版](docs/images/cover-wechat-2.35x1.jpg) | ![公众号方版封面，保留角色素材全幅](docs/images/cover-wechat-1x1.jpg) |
+
+两张 JPEG 使用独立构图，图文导出时自动生成。上传公众号时分别选择对应封面，核对后台的裁剪预览。
+
+### 公众号正文排版
+
+需要把公开榜单排成公众号正文时，可以配合独立的 MIT 工具 [WeChat Article Studio](https://github.com/lmy414/wechat-article-studio) 导入周刊 JSON。下面展示该工具的三部虚构作品示例，包含刊头、概览、作品卡、作者、指标与 BV 出处。
+
+![公众号正文实际排版：刊头与概览、作品卡与出处](https://raw.githubusercontent.com/lmy414/wechat-article-studio/main/docs/images/weekly-article-preview.jpg)
+
+[查看公众号整篇排版](https://github.com/lmy414/wechat-article-studio/blob/main/docs/images/weekly-article-full.png) · [查看排版工具与导入方法](https://github.com/lmy414/wechat-article-studio#导入周刊)
 
 ## 准备两个输入包
 
@@ -104,7 +141,7 @@ python weekly.py build --episode "我的周刊材料/第002期/episode.json" --c
 
 ## 让 AI 助手运行
 
-[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.1.0/weekly-production-1.1.0.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
+[下载 Skill 压缩包](https://github.com/lmy414/weekly-production/releases/download/v1.2.0/weekly-production-skill-v1.2.0.zip)，将其中的 `weekly-production` 文件夹放到助手支持的 Skill 目录。按[独立 Skill 安装说明](docs/USAGE.md#安装独立-skill)安装运行依赖后，可以这样交代任务：
 
 > 使用 weekly-production。读取我提供的 episode.json 和 character.json，检查材料与选段，使用现有文案、配乐和素材，导出指定路径的完整 MP4。需要补选段时，先查看本地视频，保留能独立理解的连续段落。
 
