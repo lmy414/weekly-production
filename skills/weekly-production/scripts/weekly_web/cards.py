@@ -11,6 +11,10 @@ MINT = '#deebe1'
 GREEN = '#28635b'
 CORAL = '#ffa38d'
 YELLOW = '#f4da87'
+WECHAT_COVERS = {
+    'landscape': ('cover-wechat-2.35x1.jpg', (1410, 600)),
+    'square': ('cover-wechat-1x1.jpg', (1080, 1080)),
+}
 
 
 class Cards:
@@ -53,6 +57,89 @@ class Cards:
             for x in range(8,1200,18): d.rectangle((x,y,x+1,y+1),fill='#cbd1b8')
         d.rectangle((24,24,1176,height-24),outline=INK,width=3)
         return image,d
+
+    def wechat_covers(self, issue, assets):
+        """Compose both feed formats from the character art, not a cropped video frame."""
+        outputs = {}
+        for name, (filename, size) in WECHAT_COVERS.items():
+            out = Path(assets) / filename
+            self.wechat_cover(issue, assets, out, size)
+            outputs[name] = out
+        return outputs
+
+    def wechat_cover(self, issue, assets, out, size):
+        width, height = size
+        square = width == height
+        im = Image.new('RGB', size, PAPER)
+        d = ImageDraw.Draw(im)
+        for y in range(8, height, 18):
+            for x in range(8, width, 18):
+                d.rectangle((x, y, x + 1, y + 1), fill='#cbd1b8')
+        d.rectangle((24, 24, width - 24, height - 24), outline=INK, width=3)
+        d.rectangle((44, 42, 100, 98), fill='#c8e4d9', outline=INK, width=2)
+        self.text(d, (51, 44), 'AI', 32)
+        self.text(d, (116, 40), 'AI GIRL WEEKLY', 24, GREEN)
+        self.text(d, (117, 76), 'AI 娘创作放映室', 16, GREEN)
+        badge = 'ISSUE ' + str(issue['number'])
+        d.rectangle((width - 275, 42, width - 44, 98), fill=YELLOW, outline=INK, width=2)
+        self.text(d, (width - 257, 47), badge, 29, width=197, lines=1)
+
+        left, top, right, bottom = (40, 126, width - 40, height - 74)
+        d.rectangle((left, top, right, bottom), fill=MINT, outline=INK, width=3)
+        for x in range(left + 27, right, 27):
+            d.line((x, top + 2, x, bottom - 2), fill='#c8dcd0')
+        for y in range(top + 27, bottom, 27):
+            d.line((left + 2, y, right - 2, y), fill='#c8dcd0')
+
+        label_size = 23
+        label_width = min(370, max(160, int(d.textlength(issue['label'], font=self.font(label_size))) + 32))
+        d.rectangle((76, 153, 76 + label_width, 195), fill=CORAL, outline=INK, width=2)
+        self.text(d, (91, 154), issue['label'], label_size, width=label_width - 30, lines=1)
+
+        name = self.settings.site_name.replace('AI 娘', 'AI娘')
+        title_width, title_size = (420, 125) if square else (740, 112)
+        title = name[:-2] + '\n周刊' if square and name.endswith('周刊') else name
+        while title_size > 24 and max(d.textlength(line, font=self.font(title_size)) for line in title.split('\n')) > title_width:
+            title_size -= 1
+        title_xy = (70, 242 if square else 219)
+        self.text(d, (title_xy[0] + 5, title_xy[1] + 5), title, title_size, '#fffaf0')
+        self.text(d, title_xy, title, title_size, INK)
+
+        if square:
+            self.text(d, (77, 643), '模型下班，\n角色上场。', 40, GREEN)
+            self.text(d, (79, 810), str(len(issue['works'])) + ' 部作品', 27)
+            self.text(d, (79, 856), str(issue['authors']) + ' 位创作者', 27)
+            art_box = (494, 206, right - 3, bottom - 3)
+            art_size = (535, 780)
+            circle = (489, 390, 1095, 996)
+        else:
+            self.text(d, (77, 374), '模型下班，角色上场。', 34, GREEN)
+            self.text(d, (79, 454), f"{len(issue['works'])} 部作品 · {issue['authors']} 位创作者", 25)
+            art_box = (848, top + 3, right - 3, bottom - 3)
+            art_size = (486, 730)
+            circle = (848, 167, 1370, 689)
+
+        art = Image.new('RGBA', (art_box[2] - art_box[0], art_box[3] - art_box[1]))
+        ad = ImageDraw.Draw(art)
+        ad.ellipse(tuple(value - art_box[i % 2] for i, value in enumerate(circle)), fill='#bad6de', outline=INK, width=3)
+        with Image.open(Path(assets) / Path(issue['host']).name) as source:
+            host = source.convert('RGBA')
+        bounds = host.getbbox()
+        if bounds:
+            host = host.crop(bounds)
+        host.thumbnail(art_size, Image.Resampling.LANCZOS)
+        art.alpha_composite(host, ((art.width - host.width) // 2, 9 if square else 12))
+        im.paste(art, art_box[:2], art)
+
+        sx, sy = (466, 655) if square else (783, 306)
+        points = [(sx - 11, sy - 27), (sx + 11, sy - 27), (sx + 11, sy - 11), (sx + 27, sy - 11),
+                  (sx + 27, sy + 11), (sx + 11, sy + 11), (sx + 11, sy + 27), (sx - 11, sy + 27),
+                  (sx - 11, sy + 11), (sx - 27, sy + 11), (sx - 27, sy - 11), (sx - 11, sy - 11)]
+        d.polygon([(x + 3, y + 4) for x, y in points], fill=INK)
+        d.polygon(points, fill=CORAL)
+        self.text(d, (47, height - 61), issue['period_label'], 19, GREEN, width=width - 430, lines=1)
+        self.text(d, (width - 356, height - 61), issue['basis_label'] + ' / ' + issue['date'], 18, GREEN, width=310, lines=1)
+        im.save(out, quality=95, subsampling=0, optimize=True)
 
     def heading(self,d,issue):
         d.rectangle((48,48,105,105),fill='#c8e4d9',outline=INK,width=2)

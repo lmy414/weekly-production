@@ -17,6 +17,7 @@ from weekly_runtime.pipeline import work_directory
 from weekly_web.settings import load_settings
 from weekly_web.exporter import export_site, verified_inputs
 from weekly_web.cards import Cards
+from weekly_web.builder import assert_issue
 
 
 def recorded_movie(root, issue_id="synthetic-001"):
@@ -98,6 +99,11 @@ class WebExportTests(unittest.TestCase):
                 again = export_site(episode, character, video, out)
                 self.assertEqual(result["build"]["revision"], again["build"]["revision"])
                 self.assertFalse(result["qr"]["enabled"])
+                for name, size in {"landscape": (1410, 600), "square": (1080, 1080)}.items():
+                    with Image.open(result["wechat_covers"][name]) as cover:
+                        self.assertEqual(cover.size, size)
+                        self.assertEqual(cover.format, "JPEG")
+                        self.assertEqual(cover.mode, "RGB")
                 second = root / "second"
                 second.mkdir()
                 ep2, ch2, vid2, _ = recorded_movie(second, "synthetic-002")
@@ -105,11 +111,34 @@ class WebExportTests(unittest.TestCase):
             self.assertEqual(set(updated["build"]["issues"]), {"synthetic-001", "synthetic-002"})
             self.assertEqual(updated["build"]["html_pages"], 6)
             self.assertTrue((out / "issues/synthetic-001/index.html").is_file())
+            for name in ("cover-wechat-2.35x1.jpg", "cover-wechat-1x1.jpg"):
+                self.assertTrue((out / "assets/issues/synthetic-001" / name).is_file())
             text = "".join(p.read_text("utf-8") for p in out.rglob("*") if p.suffix in (".html", ".json"))
             for value in ("PRIVATE-EDITORIAL-MARKER", "unused-signature.example", "episode.lock", "private_notes", str(episode)):
                 self.assertNotIn(value, text)
             self.assertFalse(any(p.suffix in (".mp4", ".wav") for p in out.rglob("*")))
             self.assertNotIn("style=", (out / "index.html").read_text("utf-8"))
+
+    def test_legacy_archive_and_cover_path_validation(self):
+        with TemporaryDirectory() as folder:
+            root = Path(folder)
+            episode, character, video, _ = recorded_movie(root)
+            out = root / "website"
+            with patch("weekly_web.exporter.frame_at", return_value=Image.new("RGB", (640, 360), "teal")):
+                export_site(episode, character, video, out)
+                manifest = json.loads((out / "export-manifest.json").read_text("utf-8"))
+                issue = manifest["issues"][0]
+                covers = issue.pop("wechat_covers")
+                assert_issue(issue)
+                atomic_json(out / "export-manifest.json", manifest)
+                result = export_site(episode, character, video, out)
+                self.assertEqual(set(result["wechat_covers"]), {"landscape", "square"})
+                issue["wechat_covers"] = {**covers, "private": "C:/private.png"}
+                with self.assertRaisesRegex(InputError, "公众号封面"):
+                    assert_issue(issue)
+                issue["wechat_covers"] = {**covers, "square": "/assets/issues/synthetic-001/../private.jpg"}
+                with self.assertRaisesRegex(InputError, "图片路径"):
+                    assert_issue(issue)
 
     def test_unverified_changed_video_inputs_and_program_are_rejected(self):
         with TemporaryDirectory() as folder:

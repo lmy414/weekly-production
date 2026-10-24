@@ -8,9 +8,20 @@
 python <Skill>/scripts/weekly.py export --episode <本期>/episode.json --character <角色>/character.json --output <成品.mp4> --directory <图文目录> --json
 ```
 
-成功结果含 `index`、`share_image`、`work_cards` 和 `qr`。目录包含首页、每期固定页面、往期档案、计分说明、整期长图和作品卡。网页可搜索作品、作者与 BV 号，按类型筛选，并预览、下载 PNG。
+成功结果含 `index`、`share_image`、`work_cards`、`wechat_covers` 和 `qr`。目录包含首页、每期固定页面、往期档案、计分说明、整期长图、作品卡和公众号封面。网页可搜索作品、作者与 BV 号，按类型筛选，并预览、下载 PNG。
 
 同一目录再次导出时保留往期内容，同一期会更新。只会替换由此工具生成的目录，失败保留既有页面。成片与制作工作目录须保留；导出检查 MP4 哈希、输入哈希和锁定时间轴，不要求重新渲染旧版成片。
+
+## 公众号封面
+
+每次图文导出自动生成两张 JPEG，位于 `assets/issues/<期号>/`：
+
+| 结果字段 | 文件名 | 尺寸 | 比例 |
+| --- | --- | --- | --- |
+| `wechat_covers.landscape` | `cover-wechat-2.35x1.jpg` | 1410 × 600 | 2.35:1 |
+| `wechat_covers.square` | `cover-wechat-1x1.jpg` | 1080 × 1080 | 1:1 |
+
+两种画幅分别排版刊名、期号、本期作品数和角色素材。横版突出人物上半身，方版保留角色素材全幅，不拉伸或裁切现成的视频封面。封面不叠加二维码或网站地址，不受分享卡的二维码开关影响。发布公众号时将两张图一并交付，按后台对应封面位置上传，并检查裁剪预览。
 
 ## 制作时一起导出
 

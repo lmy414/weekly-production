@@ -103,6 +103,7 @@ def make_issue(bundle, program, work, result, settings, media, editorial=None):
     issue["observed_label"] = datetime.fromtimestamp(min(observed), TZ).strftime("%m.%d %H:%M") + " — " + datetime.fromtimestamp(max(observed), TZ).strftime("%m.%d %H:%M")
     assert_issue(issue)
     cards = Cards(SKILL / "assets/ui/fonts/noto-sans-sc/NotoSansSC-variable.ttf", settings)
+    issue["wechat_covers"] = {name: prefix + path.name for name, path in cards.wechat_covers(issue, destination).items()}
     cards.entire(issue, destination, destination / "issue-share.png")
     for row in issue["works"]:
         cards.work(issue, row, destination, destination / (row["bvid"] + "-share.png"))
@@ -164,6 +165,7 @@ def export_site(episode, character, video, directory, settings=None, editorial=N
             assert scratch.parent == target.parent and scratch.name.startswith("weekly-export-")
     return {"ok": True, "directory": str(target), "index": str(target / "index.html"), "issue": issue["id"],
             "share_image": str(target / issue["share"].lstrip("/")),
+            "wechat_covers": {name: str(target / ref.lstrip("/")) for name, ref in issue["wechat_covers"].items()},
             "work_cards": [str(target / w["share"].lstrip("/")) for w in issue["works"]],
             "qr": {"enabled": settings.qr_enabled, "source": settings.qr_source,
                    "issue_url": settings.qr_target(issue), "work_urls": {w["bvid"]: settings.qr_target(issue, w) for w in issue["works"]}},
