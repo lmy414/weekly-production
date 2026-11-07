@@ -122,8 +122,8 @@ def load_inputs(episode_file, character_file, require_clips=True):
         assets[role] = str(path)
         hashes[str(path)] = checked_images[path]
     works = ep.get("works")
-    if not isinstance(works, list) or not 1 <= len(works) <= 15:
-        raise InputError("episode.works", "当前版式需要 1 至 15 条作品")
+    if not isinstance(works, list) or not 1 <= len(works) <= 25:
+        raise InputError("episode.works", "当前版式需要 1 至 25 条作品")
     rows, sources, missing, seen = [], {}, [], set()
     for index, work in enumerate(works):
         field = f"episode.works[{index}]"

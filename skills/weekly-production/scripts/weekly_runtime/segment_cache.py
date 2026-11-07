@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from .program import EXPORT_PROFILE
 
-WORK_RECIPE = "work-window-and-continuous-podium-pcm-v1"
+WORK_RECIPE = "work-fullscreen-after-rank-v3"
 
 
 def file_hash(path):
@@ -21,7 +21,8 @@ def work_fingerprint(scene, media, output):
              "clip_start": scene["clip_start"], "selection": scene["selection_method"],
              "data_seconds": scene.get("data_seconds"),
              "source": file_hash(Path(entry["path"])),
-             "plate": file_hash(output / "plates" / (scene["id"] + ".png"))}
+             "plate": file_hash(output / "plates" / (scene["id"] + ".png")),
+             "music": file_hash(output / "audio" / (scene["id"] + ".wav"))}
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 

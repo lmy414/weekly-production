@@ -85,7 +85,7 @@ python weekly.py analyze --episode "本期/episode.json" --character "角色/cha
 
 换角色时，切换 `--character` 指向的文件。至少需要 `images.default` 对应的一张透明 PNG，欢迎、转场、前三名等用途可以逐步补充。已经配置的图片必须真实存在。
 
-换配乐时，修改 `music.file`，同时填写曲名、作者和来源。`start_seconds` 控制起播点，`gain_db` 控制包装配乐相对音量。工具保留作品原声，BGM 用在包装部分。
+换配乐时，修改 `music.file`，同时填写曲名、作者和来源。`start_seconds` 控制起播点，`gain_db` 控制包装配乐相对音量。工具保留作品原声，BGM 贯穿整期并在作品段落衰减，前后平滑过渡。
 
 ## 环境与文件
 

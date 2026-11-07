@@ -10,7 +10,7 @@
 - `id`：小写字母、数字与连接号，最长 80 字符。
 - `period`：`begin`、`end` 为带时区 ISO 时间或 Unix 秒数，`timezone` 为 `Asia/Shanghai`。起点包含，终点不包含。
 - `metric_basis`：`cumulative` 或 `weekly_delta`。周榜输入明确的周期净增量，快照采集和增量依据由外部准备。
-- `works`：本期入选集合，当前固定版式接收 1 至 15 条作品。
+- `works`：本期入选集合，当前固定版式接收 1 至 25 条作品。
 
 每条作品必填 `bvid`、`title`、`author`、`source_url`、`published_at`、`observed_at`、`part_count`、`metrics`、`video`。日期均带时区，来源保留原作品链接。
 

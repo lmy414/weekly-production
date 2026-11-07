@@ -51,8 +51,8 @@ def concatenate_program(out, program):
     concat=out/"concat.txt"
     concat.write_text("\n".join(f"file 'segments/{scene['id']}.mov'" for scene in program["scenes"]),encoding="utf-8")
     temporary=out/"program.partial.mp4"
-    gain=-.75
-    for attempt in range(2):
+    gain=-3.0
+    for attempt in range(4):
         run_ffmpeg(["-f","concat","-safe",1,"-i",concat,"-c:v","copy","-af",f"volume={gain:.3f}dB",
                     "-c:a","aac","-b:a",EXPORT_PROFILE["audio_bitrate"],"-movflags","+faststart",temporary],out/"concat.log",timeout=600)
         run_ffmpeg(["-i",temporary,"-vn","-af","loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json","-f","null","-"],out/"master-loudness.log",timeout=300)
@@ -107,12 +107,14 @@ def render_program(out, program, media, capture, workers=2):
                 ImageDraw.Draw(image).rectangle((44,184,1443,971),fill=(0,0,0,0))
                 image.save(transparent)
             image_filter="scale=1400:788:force_original_aspect_ratio=decrease,pad=1400:788:(ow-iw)/2:(oh-ih)/2:color=0x1b2935,setsar=1"
-            if scene["template"]=="podium":
-                vf=f"[0:v]fps=30,split=2[small][large];[small]{image_filter}[win];color=c=0xf6f1e2:s=1920x1080:r=30:d={seconds}[bg];[bg][win]overlay=44:184[base];[base][1:v]overlay=0:0[framed];[large]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[full];[full][framed]overlay=0:0:enable='lt(t,7)':shortest=1,format=yuv420p[v]"
-            else:
-                vf=f"[0:v]fps=30,{image_filter}[win];color=c=0xf6f1e2:s=1920x1080:r=30:d={seconds}[bg];[bg][win]overlay=44:184[base];[base][1:v]overlay=0:0:shortest=1,format=yuv420p[v]"
-            af=f"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000,apad,atrim=duration={seconds},afade=t=in:d=0.08,afade=t=out:st={max(0,seconds-.12)}:d=0.12[a]"
-            inputs=["-i",clip,"-loop",1,"-framerate",30,"-i",transparent]
+            # Show rank and score first, then let each source clip occupy the full canvas.
+            framed_seconds = scene.get("data_seconds", 7)
+            vf=f"[0:v]fps=30,split=2[small][large];[small]{image_filter}[win];color=c=0xf6f1e2:s=1920x1080:r=30:d={seconds}[bg];[bg][win]overlay=44:184[base];[base][1:v]overlay=0:0[framed];[large]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[full];[full][framed]overlay=0:0:enable='lt(t,{framed_seconds})':shortest=1[composite]"
+            vf+=f";[composite]split[main][barbase];[barbase]crop=1352:12:68:948,drawbox=x=0:y=0:w=1352:h=12:color=0x172d36@0.75:t=fill[track];color=c=0x8be4ce:s=1352x8:r=30:d={seconds}[fill];[track][fill]overlay=x='-W+W*t/{seconds}':y=2:eval=frame:shortest=1[bar];[main][bar]overlay=x=68:y='if(lt(t,{framed_seconds}),948,1060)':eval=frame:shortest=1,format=yuv420p[v]"
+            fade_in=min(.35,seconds/4)
+            fade_out=min(.4,seconds/4)
+            af=f"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000,apad,atrim=duration={seconds},afade=t=in:d={fade_in},afade=t=out:st={max(0,seconds-fade_out)}:d={fade_out}[original];[2:a]atrim=duration={seconds},asetpts=PTS-STARTPTS[music];[original][music]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.89[a]"
+            inputs=["-i",clip,"-loop",1,"-framerate",30,"-i",transparent,"-i",out/"audio"/(sid+".wav")]
             run_ffmpeg([*inputs,"-filter_complex",vf+";"+af,"-map","[v]","-map","[a]",*common],segments/(sid+".log"),timeout=600)
         else:
             if scene.get("animation"):

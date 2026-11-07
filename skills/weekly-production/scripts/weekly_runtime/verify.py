@@ -48,19 +48,25 @@ def verify(out, target_override=None):
                 stream = source.streams.video[0]
                 resolution = [stream.width, stream.height]
                 for label, position in (('start', 0.2), ('end', scene['duration'] - 0.2)):
-                    reference = frame_at(source, position)
                     picture = frame_at(actual, scene['start'] + position)
-                    framed = scene['template'] == 'ranking' or position < scene.get('data_seconds', 7)
+                    framed = position < scene.get('data_seconds', 7)
                     if framed:
                         picture = picture.crop((44, 184, 1444, 972))
                     size = picture.size
-                    expected = Image.new('RGB', size, (27, 41, 53) if framed else (0, 0, 0))
-                    scaled = ImageOps.contain(reference, size, Image.Resampling.BICUBIC)
-                    expected.paste(scaled, ((size[0] - scaled.width) // 2, (size[1] - scaled.height) // 2))
                     a = np.asarray(picture.convert('L').resize((160, 90)), dtype=float)
-                    b = np.asarray(expected.convert('L').resize((160, 90)), dtype=float)
-                    error = float(np.mean(np.abs(a - b)))
-                    report['boundaries'].append({'bvid': bvid, 'rank': scene['row']['rank'], 'edge': label, 'source_resolution': resolution, 'mae': round(error, 4), 'mode': 'window' if framed else 'fullscreen'})
+                    # CFR conversion can choose either neighbor of the requested source timestamp.
+                    # Compare that small source-frame neighborhood, preserving the MAE threshold.
+                    frame_step = 1 / float(stream.average_rate)
+                    errors = []
+                    for shift in (-frame_step, 0, frame_step):
+                        reference = frame_at(source, max(0, position + shift))
+                        expected = Image.new('RGB', size, (27, 41, 53) if framed else (0, 0, 0))
+                        scaled = ImageOps.contain(reference, size, Image.Resampling.BICUBIC)
+                        expected.paste(scaled, ((size[0] - scaled.width) // 2, (size[1] - scaled.height) // 2))
+                        b = np.asarray(expected.convert('L').resize((160, 90)), dtype=float)
+                        errors.append((float(np.mean(np.abs(a - b))), shift))
+                    error, shift = min(errors)
+                    report['boundaries'].append({'bvid': bvid, 'rank': scene['row']['rank'], 'edge': label, 'source_resolution': resolution, 'mae': round(error, 4), 'reference_shift_seconds': round(shift, 5), 'mode': 'window' if framed else 'fullscreen'})
                     check(error < 12, (bvid, label, error))
         for template in ('chapter', 'next', 'podium_reveal', 'news_chapter'):
             scene = next((s for s in program['scenes'] if s['template'] == template), None)

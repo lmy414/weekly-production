@@ -38,10 +38,29 @@ class FileInputTests(unittest.TestCase):
         self.assertEqual(len(set(bundle["assets"].values())), 1)
         self.assertEqual(len(bundle["rows"]), 3)
         program = assemble(bundle)
-        self.assertEqual(next(s["start"] for s in program["scenes"] if s["template"] == "podium"), 16)
+        self.assertEqual(next(s["start"] for s in program["scenes"] if s["template"] == "podium"), 40)
+        first_work = next(i for i, s in enumerate(program["scenes"]) if s["template"] == "podium")
+        self.assertTrue(all(s["template"] in ("opening", "rundown", "scope", "scoring", "scoring_details", "podium_reveal") for s in program["scenes"][:first_work]))
         self.assertTrue(all(s["duration"] == 2 for s in program["scenes"] if s["template"] == "podium"))
         self.assertFalse(program["context"]["audio"]["narration"])
         self.assertNotIn("news", [s["template"] for s in program["scenes"]])
+
+    def test_top_25_has_two_readable_rundown_pages(self):
+        data = deepcopy(self.base)
+        data["works"] = []
+        for n in range(1, 26):
+            row = deepcopy(self.base["works"][0])
+            row.update(bvid="BV111111111" + "123456789ABCDEFGHJKLMNPQR"[n - 1], title=f"虚构测试作品 {n}",
+                       source_url=f"https://example.org/synthetic/{n}")
+            row["metrics"]["view"] = 1000 + n
+            data["works"].append(row)
+        write_json(self.episode, data)
+        program = assemble(self.load())
+        pages = [s for s in program["scenes"] if s["template"] == "rundown"]
+        self.assertEqual([(s["lineup_start"], s["lineup_end"]) for s in pages], [(0, 15), (15, 25)])
+        self.assertEqual(len([s for s in program["scenes"] if s["template"] in ("ranking", "podium")]), 25)
+        self.assertLess(max(s["end"] for s in program["scenes"] if s["template"] in ("scoring", "scoring_details")),
+                        min(s["start"] for s in program["scenes"] if s["template"] in ("ranking", "podium")))
 
     def test_relevance_flags_and_private_database_are_not_required(self):
         with patch("socket.socket.connect", side_effect=AssertionError("network forbidden")):

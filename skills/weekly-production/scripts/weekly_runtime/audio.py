@@ -16,6 +16,8 @@ VERSION = "whale-studio-score-v1"
 RATE = 48000
 BEAT = .5
 LOOP_SECONDS = 16
+WORK_BGM_GAIN = 10 ** (-26 / 20)
+WORK_TRANSITION_SECONDS = 1.2
 
 
 def note(midi, seconds, voice="bell"):
@@ -219,26 +221,33 @@ def prepare_recorded_audio(program, directory):
     gain = 10 ** (spec["gain_db"] / 20)
     work = {"ranking", "podium"}
     scenes = program["scenes"]
-    report = {"version": "recorded-bgm-v1", "sample_rate": RATE, "channels": 2, "narration": False,
+    report = {"version": "recorded-bgm-v2", "sample_rate": RATE, "channels": 2, "narration": False,
               "composition": "external recording; source vocals and pitch preserved", "bgm": deepcopy(spec),
-              "decoded_samples": len(recording), "timeline": "continuous across non-work scenes", "scenes": {}}
+              "decoded_samples": len(recording), "timeline": "continuous across all scenes",
+              "work_bgm_gain_db": -26, "work_transition_seconds": WORK_TRANSITION_SECONDS, "scenes": {}}
     for index, scene in enumerate(scenes):
-        if scene["template"] in work:
-            continue
         length = round(scene["duration"] * RATE)
         begin = cursor
         indices = (np.arange(length) + cursor) % len(recording)
         track = recording[indices].copy() * gain
-        if scene["template"] in ("next", "chapter", "podium_reveal"):
+        is_work = scene["template"] in work
+        if is_work:
+            track *= WORK_BGM_GAIN
+        elif scene["template"] in ("next", "chapter", "podium_reveal"):
             transition_sweep(track, scene, gain=.06)
-        previous_music = index > 0 and scenes[index - 1]["template"] not in work
-        following_music = index + 1 < len(scenes) and scenes[index + 1]["template"] not in work
-        if not previous_music:
-            fade = min(round(.12 * RATE), length // 2)
-            track[:fade] *= np.linspace(0, 1, fade, dtype=np.float32)[:, None]
-        if not following_music:
-            fade = min(round((1.2 if scene["template"] == "end" else .12) * RATE), length // 2)
-            track[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)[:, None]
+        if not is_work:
+            if index == 0:
+                fade = min(round(.35 * RATE), length // 2)
+                track[:fade] *= np.linspace(0, 1, fade, dtype=np.float32)[:, None]
+            elif scenes[index - 1]["template"] in work:
+                fade = min(round(WORK_TRANSITION_SECONDS * RATE), length // 2)
+                track[:fade] *= np.linspace(WORK_BGM_GAIN, 1, fade, dtype=np.float32)[:, None]
+            if index == len(scenes) - 1:
+                fade = min(round(1.2 * RATE), length // 2)
+                track[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)[:, None]
+            elif scenes[index + 1]["template"] in work:
+                fade = min(round(WORK_TRANSITION_SECONDS * RATE), length // 2)
+                track[-fade:] *= np.linspace(1, WORK_BGM_GAIN, fade, dtype=np.float32)[:, None]
         peak = float(np.max(np.abs(track)))
         if peak > .65:
             track *= .65 / peak

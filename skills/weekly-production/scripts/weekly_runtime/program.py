@@ -9,7 +9,7 @@ HOST_ASSETS = {role: None for role in ROLES}
 
 MOTION_TEMPLATES = {"chapter", "next", "podium_reveal"}
 
-TEMPLATE_VERSION = "pixel-studio-v9"
+TEMPLATE_VERSION = "pixel-studio-v10"
 
 UPDATE_SCHEDULE = "每周六晚 22:00 更新（北京时间）"
 
@@ -77,7 +77,14 @@ def make_program(manifest, selected):
         scenes.append(scene)
 
     add("opening", 4, "创刊特辑开场" if manifest["kind"]=="cumulative" else "本周节目开场", host_art="welcome")
-    add("rundown", 7, "本期榜单", host_art="welcome")
+    add("scope", 6, "收录规则", host_art="scope", page="inclusion")
+    add("scope", 3, "本期统计区间", host_art="scope", page="period")
+    add("scoring", 5, "综合计分公式", host_art="score", page="formula")
+    add("scoring", 7, "五项修正系数", host_art="score", page="coefficients")
+    add("scoring_details", 3, "得分与同分排序", host_art="thinking")
+    for offset in range(0, len(selected), 15):
+        add("rundown", 7, "本期榜单", host_art="welcome",
+            lineup_start=offset, lineup_end=min(offset + 15, len(selected)))
     for row in reversed([row for row in selected if row["rank"] > 3]):
         add("ranking", min(20, row["duration"]), f"第 {row['rank']} 名", row=row,
             host_art=("watching", "applause", "surprise", "thinking")[row["rank"] % 4],
@@ -93,11 +100,6 @@ def make_program(manifest, selected):
             host_art=podium_art,
             data_seconds=7, selection_method="unselected")
     add("summary", 12, "本期主榜回看")
-    add("scope", 6, "收录规则", host_art="scope", page="inclusion")
-    add("scope", 3, "本期统计区间", host_art="scope", page="period")
-    add("scoring", 5, "综合计分公式", host_art="score", page="formula")
-    add("scoring", 7, "五项修正系数", host_art="score", page="coefficients")
-    add("scoring_details", 3, "得分与同分排序", host_art="thinking")
     add("statistics", 10, "下期想看谁？", host_art="scope")
     add("outro", 10, "片尾", host_art="applause")
     add("credits", 10, "出处与署名")

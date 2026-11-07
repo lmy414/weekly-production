@@ -32,27 +32,35 @@ class MediaAudioTests(unittest.TestCase):
     def bundle(self):
         return load_inputs(self.episode, self.character)
 
-    def test_recorded_music_is_continuous_and_does_not_overlay_work(self):
+    def test_recorded_music_ducks_across_work_without_restarting(self):
         bundle = self.bundle()
         program = {"context": {"audio": {"narration": False}}, "scenes": [
-            {"id": "a", "template": "opening", "duration": 1},
-            {"id": "b", "template": "scope", "duration": 1},
-            {"id": "work", "template": "ranking", "duration": 30},
+            {"id": "a", "template": "opening", "duration": 2},
+            {"id": "work", "template": "ranking", "duration": 2},
+            {"id": "b", "template": "scope", "duration": 2},
             {"id": "c", "template": "end", "duration": 1}]}
         configure_bgm(program, bundle["bgm"])
         with tempfile.TemporaryDirectory() as folder:
             report = prepare_audio(program, folder)
-            self.assertNotIn("work", report["scenes"])
-            self.assertEqual([report["scenes"][key]["source_start_sample"] for key in ("a", "b", "c")], [0, RATE, 2 * RATE])
+            self.assertEqual([report["scenes"][key]["source_start_sample"] for key in ("a", "work", "b", "c")],
+                             [0, 2 * RATE, 0, 2 * RATE])
+            self.assertEqual(report["timeline"], "continuous across all scenes")
+            self.assertEqual(report["work_bgm_gain_db"], -26)
             self.assertFalse(report["narration"])
             def pcm(path):
                 with wave.open(str(path), "rb") as sound:
                     self.assertEqual((sound.getframerate(), sound.getnchannels()), (RATE, 2))
                     return np.frombuffer(sound.readframes(sound.getnframes()), dtype="<i2").reshape(-1, 2).astype(float)
             source = pcm(Path(folder) / "bgm-normalized.wav")
-            actual = pcm(Path(folder) / "b.wav")
-            expected = source[RATE:2 * RATE] * 10 ** (-1.5 / 20)
-            self.assertLess(float(np.max(np.abs(actual[9600:-9600] - expected[9600:-9600]))), 3)
+            music = pcm(Path(folder) / "work.wav")
+            gain = 10 ** (-1.5 / 20) * 10 ** (-26 / 20)
+            self.assertLess(float(np.max(np.abs(music[1000:-1000] - source[2 * RATE:4 * RATE][1000:-1000] * gain))), 3)
+            before = pcm(Path(folder) / "a.wav")
+            before_envelope = np.linspace(1, 10 ** (-26 / 20), RATE)
+            self.assertLess(float(np.max(np.abs(before[-RATE:] - source[RATE:2 * RATE] * 10 ** (-1.5 / 20) * before_envelope[:, None]))), 3)
+            after = pcm(Path(folder) / "b.wav")
+            after_envelope = np.linspace(10 ** (-26 / 20), 1, RATE)
+            self.assertLess(float(np.max(np.abs(after[:RATE] - source[:RATE] * 10 ** (-1.5 / 20) * after_envelope[:, None]))), 3)
 
     def test_local_range_is_cropped_and_corrupted_cache_rebuilt(self):
         data = deepcopy(self.base)
@@ -78,11 +86,15 @@ class MediaAudioTests(unittest.TestCase):
             source = out / "source.mp4"; source.write_bytes(b"synthetic source")
             media = {scene["row"]["bvid"]: {"path": str(source)}}
             target = out / "work.mov"; target.write_bytes(b"synthetic encoding")
+            (out / "audio").mkdir()
+            music = out / "audio" / (scene["id"] + ".wav"); music.write_bytes(b"synthetic music")
             fingerprint = work_fingerprint(scene, media, out)
             entry = record(fingerprint, target)
             self.assertTrue(matches(entry, fingerprint, target))
             self.assertEqual(fingerprint, work_fingerprint({**scene, "start": 100}, media, out))
             source.write_bytes(b"changed source")
+            self.assertNotEqual(fingerprint, work_fingerprint(scene, media, out))
+            music.write_bytes(b"different music")
             self.assertNotEqual(fingerprint, work_fingerprint(scene, media, out))
             target.write_bytes(b"broken encoding")
             self.assertFalse(matches(entry, fingerprint, target))
